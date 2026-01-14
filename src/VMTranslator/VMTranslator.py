@@ -3,5 +3,9 @@ from src.VMTranslator.code_writer.code_writer import CodeWriter
 
 class VMTranslator:
   def __init__(self):
-    self.writer = CodeWriter()
-    self.parser = Parser()
+    self.code = CodeWriter()
+
+  def encode(self, filepath):
+    self.parser = Parser(filepath)
+    while self.parser.hasMoreLines():
+      self.parser.advance()
