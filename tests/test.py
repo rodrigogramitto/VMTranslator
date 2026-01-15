@@ -1,5 +1,6 @@
 import tempfile
 import os
+from src.VMTranslator.parser.library.commandType import CommandType
 
 from src.VMTranslator.parser.parse import Parser
 # from src.VMTranslator.CommandType import (
@@ -25,8 +26,7 @@ def test_ignore_comments_and_blank_lines():
     push constant 8
 
     // another comment
-    add
-    """)
+    add""")
 
     parser = Parser(path)
 
@@ -37,12 +37,12 @@ def test_ignore_comments_and_blank_lines():
 
     os.remove(path)
 
-    print(commands)
+    print('commands: ', commands)
 
     assert commands == [
-        ['push', 'constant', '7'],
-        ['push', 'constant', '8'],
-       ['add']
+        'push constant 7',
+        'push constant 8',
+        'add'
     ]
 
 
@@ -52,7 +52,7 @@ def test_arithmetic_command():
     parser = Parser(path)
     parser.advance()
 
-    assert parser.commandType() == 'C_ARITHMETIC'
+    assert parser.commandType() == CommandType.C_ARITHMETIC
     assert parser.arg1() == "add"
 
     os.remove(path)
@@ -64,7 +64,7 @@ def test_push_command():
     parser = Parser(path)
     parser.advance()
 
-    assert parser.commandType() == 'C_PUSH'
+    assert parser.commandType() == CommandType.C_PUSH
     assert parser.arg1() == "local"
     assert parser.arg2() == 3
 
@@ -77,7 +77,7 @@ def test_pop_command():
     parser = Parser(path)
     parser.advance()
 
-    assert parser.commandType() == 'C_POP'
+    assert parser.commandType() == CommandType.C_POP
     assert parser.arg1() == "argument"
     assert parser.arg2() == 2
 
@@ -90,7 +90,7 @@ def test_return_command():
     parser = Parser(path)
     parser.advance()
 
-    assert parser.commandType() == 'C_RETURN'
+    assert parser.commandType() == CommandType.C_RETURN
 
     try:
         parser.arg1()
@@ -112,8 +112,7 @@ def test_command_sequence_order():
     push constant 10
     push constant 20
     add
-    pop local 0
-    """)
+    pop local 0""")
 
     parser = Parser(path)
 
