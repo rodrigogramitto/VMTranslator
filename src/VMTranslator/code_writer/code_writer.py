@@ -10,15 +10,31 @@ class CodeWriter:
         tokens = filepath.split('.')
         return f"""{tokens[0]}.asm"""
 
-    def writeArithmetic(self, command):
+    def writeArithmetic(self, command, line_number):
         with open(self.file_name, "a") as out_file:
             asm = ''
-
+            if command == 'add':
+                asm = self.get_add()
+            elif command == 'sub':
+                asm = self.get_sub()
+            elif command == 'neg':
+                asm = self.get_neg()
+            elif command == 'eq':
+                asm = self.get_eq(line_number)
+            elif command == 'gt':
+                asm = self.get_gt(line_number)
+            elif command == 'lt':
+                asm = self.get_lt(line_number)
+            elif command == 'and':
+                asm = self.get_and()
+            elif command == 'or':
+                asm = self.get_or()
+            elif command == 'not':
+                asm = self.get_not()
             if len(asm):
                 out_file.write(asm)
 
     def writePushPop(self, command, segment, index):
-        print("command: ", command)
         with open(self.file_name, "a") as out_file:
             asm = ''
             if command == 'push':
@@ -85,3 +101,130 @@ class CodeWriter:
 
     def get_segment_pointer(self, segment):
         return SEGMENT_MAP[segment]
+
+    def get_add(self):
+       return """
+        @SP
+        M=M-1
+        A=M
+        D=M
+        A=A-1
+        M=D+M
+        """
+
+    def get_sub(self):
+        return """
+        @SP
+        M=M-1
+        A=M
+        D=M
+        A=A-1
+        M=M-D
+        """
+
+    def get_neg(self):
+        return """
+        @SP
+        A=M
+        A=A-1
+        M=-M
+        """
+
+    def get_eq(self, line_number):
+        return f"""
+        @SP
+        M=M-1
+        A=M
+        D=M
+        A=A-1
+        D=D-M
+        @EQ_{line_number}
+        D;JEQ
+        @SP
+        A=M
+        A=A-1
+        M=0
+        @END_{line_number}
+        0;JMP
+        (EQ_{line_number})
+        @SP
+        A=M
+        A=A-1
+        M=-1
+        (END_{line_number})
+        """
+
+    def get_gt(self, line_number):
+        return f"""
+        @SP
+        M=M-1
+        A=M
+        D=M
+        A=A-1
+        D=D-M
+        @GT_{line_number}
+        D;JLT
+        @SP
+        A=M
+        A=A-1
+        M=0
+        @END_{line_number}
+        0;JMP
+        (GT_{line_number})
+        @SP
+        A=M
+        A=A-1
+        M=-1
+        (END_{line_number})
+        """
+
+    def get_lt(self, line_number):
+        return f"""
+        @SP
+        M=M-1
+        A=M
+        D=M
+        A=A-1
+        D=D-M
+        @LT_{line_number}
+        D;JGT
+        @SP
+        A=M
+        A=A-1
+        M=0
+        @END_{line_number}
+        0;JMP
+        (LT_{line_number})
+        @SP
+        A=M
+        A=A-1
+        M=-1
+        (END_{line_number})
+        """
+    def get_and(self):
+        return """
+        @SP
+        M=M-1
+        A=M
+        D=M
+        A=A-1
+        M=D&M
+        """
+
+    def get_or(self):
+        return """
+        @SP
+        M=M-1
+        A=M
+        D=M
+        A=A-1
+        M=D|M
+        """
+
+    def get_not(self):
+        return """
+        @SP
+        A=M
+        A=A-1
+        M=!M
+        """

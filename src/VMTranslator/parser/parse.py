@@ -10,6 +10,7 @@ class Parser:
   def __init__(self, filepath):
     filepath = Path(filepath).resolve()
     self.cur_instruction = ''
+    self.line_number = 0
     with open(filepath) as file:
       self.lines = deque(file.readlines())
 
@@ -20,6 +21,7 @@ class Parser:
     return self.cur_instruction.split(' ')
 
   def advance(self):
+    self.line_number += 1
     while self.hasMoreLines():
       curline = self.lines.popleft()
       curline = curline.split("//")[0].strip()

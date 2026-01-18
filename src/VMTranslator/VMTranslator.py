@@ -16,4 +16,4 @@ class VMTranslator:
         self.code.writePushPop(cmd, seg, idx)
       elif self.parser.commandType() == CommandType.C_ARITHMETIC:
         cmd = self.parser.get_instruction()[0]
-        self.code.writeArithmetic(cmd)
+        self.code.writeArithmetic(cmd, self.parser.line_number)
