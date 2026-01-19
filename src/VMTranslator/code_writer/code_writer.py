@@ -1,5 +1,7 @@
 from src.VMTranslator.code_writer.library.segmentMap import SEGMENT_MAP
 
+#missing pop temp, static and pointer
+
 class CodeWriter:
     def __init__(self, filepath):
         self.file_name = self.get_file_name(filepath)
@@ -47,32 +49,82 @@ class CodeWriter:
     def writePush(self, segment, index):
         if segment == 'constant':
             return self.push_constant(index)
+        elif segment == 'temp':
+            return self.push_temp(index)
+        elif segment == 'static':
+            return self.push_static(index, self.file_name)
+        elif segment == 'pointer':
+            return self.push_pointer(index)
         elif self.is_valid_segment(segment):
             return self.push_segment(index, self.get_segment_pointer(segment))
         else:
-            ValueError("segment invalid")
+            raise ValueError("segment invalid")
 
     def writePop(self, segment, index):
+        if segment == 'temp':
+            return self.get_pop_temp(index)
+        elif segment == 'static':
+            return self.get_pop_static(index, self.file_name)
+        elif segment == 'pointer':
+            return self.get_pop_pointer(index)
+        elif self.is_valid_segment(segment):
+            return self.get_pop_segment(self.get_segment_pointer(segment), index)
+        else:
+            raise ValueError("segment invalid")
+
+    def get_pop_segment(self, segment, index):
         return f"""
-            @{segment}
-            D=M
-            @{index}
-            D=D+M
-            @addr
-            M=D
-            @SP
-            M=M-1
-            A=M
-            D=M
-            @addr
-            M=D
+        @{segment}
+        D=M
+        @{index}
+        D=D+A
+        @R13
+        M=D
+        @SP
+        M=M-1
+        A=M
+        D=M
+        @R13
+        A=M
+        M=D
+        """
+
+    def get_pop_temp(self, index):
+        idx = 5 + int(index)
+        return f"""
+        @SP
+        M=M-1
+        A=M
+        D=M
+        @{idx}
+        M=D
+        """
+
+    def get_pop_static(self, index, filename):
+        return f"""
+        @SP
+        M=M-1
+        A=M
+        D=M
+        @{filename}.{index}
+        M=D
+        """
+
+    def get_pop_pointer(self, index):
+        addr = 'THIS' if index == '0' else 'THAT'
+        return f"""
+        @SP
+        M=M-1
+        A=M
+        D=M
+        @{addr}
+        M=D
         """
 
     def push_constant(self, index):
         return f"""
         @{index}
         D=A
-        // RAM[SP]=D
         @SP
         A=M
         M=D
@@ -83,17 +135,52 @@ class CodeWriter:
 
     def push_segment(self, index, segment):
         return f"""
-            @{segment}
-            D=M
-            @{index}
-            D=D+M
-            A=D
-            D=M
-            @SP
-            A=M
-            M=D
-            @SP
-            M=M+1
+        @{segment}
+        D=M
+        @{index}
+        D=D+A
+        A=D
+        D=M
+        @SP
+        A=M
+        M=D
+        @SP
+        M=M+1
+        """
+
+    def push_static(self, index, filename):
+        return f"""
+        @{filename}.{index}
+        D=M
+        @SP
+        A=M
+        M=D
+        @SP
+        M=M+1
+        """
+
+    def push_temp(self, index):
+        temp_idx = 5 + int(index)
+        return f"""
+        @{temp_idx}
+        D=M
+        @SP
+        A=M
+        M=D
+        @SP
+        M=M+1
+        """
+
+    def push_pointer(self, index):
+        idx = 'THIS' if index == '0' else 'THAT'
+        return f"""
+        @{idx}
+        D=M
+        @SP
+        A=M
+        M=D
+        @SP
+        M=M+1
         """
 
     def is_valid_segment(self, segment):
