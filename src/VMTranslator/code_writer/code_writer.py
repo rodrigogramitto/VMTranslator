@@ -288,6 +288,7 @@ class CodeWriter:
         M=-1
         (END_{line_number})
         """
+
     def get_and(self):
         return """
         @SP
@@ -315,3 +316,28 @@ class CodeWriter:
         A=A-1
         M=!M
         """
+    # SECTION TODO:
+    def setFileName(self):
+        return
+
+    def writeGoto(self):
+        return
+
+    def writeIf(self):
+        return
+
+    def writeFunction(self):
+        return
+
+    def writeCall(self):
+        return
+
+    def writeReturn(self):
+        return
+
+    #close output file
+    def close(self):
+        return
+
+    def bootstrap(self):
+        return

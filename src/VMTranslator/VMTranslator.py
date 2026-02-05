@@ -6,6 +6,14 @@ class VMTranslator:
   def __init__(self):
     return
 
+  #Add folder handling:
+    # if source is a file ->
+    #  constructs a parser to handle the input file
+    # for each vm command in input -> use parser to parse commmand, use codewriter to generate the assembly code from it
+
+    #if source is folder
+      # handles every .vm file in the folder in the manner described above
+
   def encode(self, filepath):
     self.parser = Parser(filepath)
     self.code = CodeWriter(filepath)

@@ -31,6 +31,7 @@ class Parser:
       return
     self.cur_instruction = ''
 
+  #Ensure all command types are now handled
   def commandType(self):
     cmd = self.get_instruction()[0]
     if cmd in ARITHMETIC_COMMANDS:
@@ -64,3 +65,7 @@ class Parser:
       raise ValueError("arg2() not valid for this command type")
 
     return int(tokens[2])
+
+  def setFileName(self, name):
+    # informs that the translation of a new vm file has started (called by vm translator)
+    return
