@@ -344,8 +344,31 @@ class CodeWriter:
     def writeFunction(self):
         return
 
-    def writeCall(self):
-        return
+    def writeCall(self, function_name, n_args):
+        asm = f"""
+        @{function_name}$ret.{self.call_id}
+        {self.get_segment_push('LCL')}
+        {self.get_segment_push('ARG')}
+        {self.get_segment_push('THIS')}
+        {self.get_segment_push('THAT')}
+        @SP
+        D=M
+        @5
+        D=D-M
+        @{n_args}
+        D=D-M
+        @ARG
+        M=D
+        @SP
+        D=M
+        @LCL
+        M=D
+        @{function_name}
+        0;JMP
+        ({function_name}$ret.{self.call_id})
+        """
+        self.call_id += 1
+        self.write_asm(asm)
 
     def writeReturn(self):
         return
@@ -354,10 +377,31 @@ class CodeWriter:
     def close(self):
         return
 
-    def bootstrap(self):
-        return
-
     def write_asm(self, asm):
         with open(self.file_name, "a") as out_file:
             if len(asm):
                 out_file.write(textwrap.dedent(asm))
+
+    def get_segment_push(self, segment):
+        return f"""
+        @{segment}
+        D=M
+        @SP
+        A=M
+        M=D
+        @SP
+        M=M+1
+        """
+
+    def write_bootstrap(self):
+        asm = f"""
+        @256
+        D=A
+        @SP
+        M=D
+        """
+        self.write_asm(asm)
+
+    def bootstrap(self):
+        self.write_bootstrap()
+        self.writeCall('Sys.init', 0)
