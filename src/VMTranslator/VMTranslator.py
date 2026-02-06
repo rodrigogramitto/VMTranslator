@@ -54,3 +54,6 @@ class VMTranslator:
       elif cur_cmd_type == CommandType.C_IF:
         label = self.parser.get_instruction()[1]
         self.code.writeIf(label)
+      elif cur_cmd_type == CommandType.C_FUNCTION:
+        cmd, name, params = self.parser.get_instruction()
+        self.code.writeFunction(name, params)

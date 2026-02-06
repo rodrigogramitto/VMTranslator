@@ -340,8 +340,19 @@ class CodeWriter:
         self.write_asm(asm)
 
 
-    def writeFunction(self):
-        return
+    def writeFunction(self, function_name, n_vars):
+        var_init = """
+        @SP
+        A=M
+        M=0
+        @SP
+        M=M+1
+        """
+        asm = f"""
+        ({function_name})
+        """
+        asm += var_init * int(n_vars)
+        self.write_asm(asm)
 
     def writeCall(self, function_name, n_args):
         asm = f"""
