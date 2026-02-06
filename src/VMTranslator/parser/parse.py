@@ -1,4 +1,3 @@
-from pathlib import Path
 from collections import deque
 from src.VMTranslator.parser.library.commandType import CommandType
 from src.VMTranslator.parser.library.commands import (
@@ -7,11 +6,11 @@ from src.VMTranslator.parser.library.commands import (
 )
 
 class Parser:
-  def __init__(self, filepath):
-    filepath = Path(filepath).resolve()
+  def __init__(self):
+    self.file_name = ''
     self.cur_instruction = ''
     self.line_number = 0
-    with open(filepath) as file:
+    with open(self.file_name) as file:
       self.lines = deque(file.readlines())
 
   def hasMoreLines(self):
@@ -31,7 +30,6 @@ class Parser:
       return
     self.cur_instruction = ''
 
-  #Ensure all command types are now handled
   def commandType(self):
     cmd = self.get_instruction()[0]
     if cmd in ARITHMETIC_COMMANDS:
@@ -67,5 +65,4 @@ class Parser:
     return int(tokens[2])
 
   def setFileName(self, name):
-    # informs that the translation of a new vm file has started (called by vm translator)
-    return
+    self.file_name = name

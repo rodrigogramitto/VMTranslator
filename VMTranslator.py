@@ -11,17 +11,8 @@ def main():
 
     input_path = sys.argv[1]
 
-    # Basic validation
-    if not input_path.endswith(".vm"):
-        print("Error: input file must have a .vm extension")
-        sys.exit(1)
-
-    if not os.path.isfile(input_path):
-        print(f"Error: file not found: {input_path}")
-        sys.exit(1)
-
-    translator = VMTranslator()
-    translator.encode(input_path)
+    translator = VMTranslator(input_path)
+    #translator.encode()
 
 
 if __name__ == "__main__":

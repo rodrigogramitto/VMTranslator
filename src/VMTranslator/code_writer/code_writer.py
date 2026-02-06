@@ -3,14 +3,10 @@ from src.VMTranslator.code_writer.library.segmentMap import SEGMENT_MAP
 #missing pop temp, static and pointer
 
 class CodeWriter:
-    def __init__(self, filepath):
-        self.file_name = self.get_file_name(filepath)
+    def __init__(self, file_name):
+        self.file_name = file_name
         with open(self.file_name, 'w') as f:
             return
-
-    def get_file_name(self, filepath):
-        tokens = filepath.split('.')
-        return f"""{tokens[0]}.asm"""
 
     def writeArithmetic(self, command, line_number):
         with open(self.file_name, "a") as out_file:

@@ -1,22 +1,23 @@
+from pathlib import Path
 from src.VMTranslator.parser.parse import Parser
 from src.VMTranslator.code_writer.code_writer import CodeWriter
 from src.VMTranslator.parser.library.commandType import CommandType
 
 class VMTranslator:
-  def __init__(self):
-    return
+  def __init__(self, filepath):
+    self.out_file = ''
+    self.parser = Parser()
+    p = Path(filepath)
 
-  #Add folder handling:
-    # if source is a file ->
-    #  constructs a parser to handle the input file
-    # for each vm command in input -> use parser to parse commmand, use codewriter to generate the assembly code from it
+    if p.is_file():
+      file = Path(filepath).resolve()
+      self.parser.setFileName(file)
+      self.encode()
+    elif p.is_dir():
+      print('P is a directory: ', p)
 
-    #if source is folder
-      # handles every .vm file in the folder in the manner described above
-
-  def encode(self, filepath):
-    self.parser = Parser(filepath)
-    self.code = CodeWriter(filepath)
+  def encode(self):
+    self.code = CodeWriter(self.out_file)
     while self.parser.hasMoreLines():
       self.parser.advance()
       cur_cmd_type = self.parser.commandType()
