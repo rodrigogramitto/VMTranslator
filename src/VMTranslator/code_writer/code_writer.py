@@ -1,10 +1,12 @@
 from src.VMTranslator.code_writer.library.segmentMap import SEGMENT_MAP
+import textwrap
 
 #missing pop temp, static and pointer
 
 class CodeWriter:
     def __init__(self, file_name):
         self.file_name = file_name
+        self.call_id = 0
         with open(self.file_name, 'w') as f:
             return
 
@@ -30,7 +32,7 @@ class CodeWriter:
             elif command == 'not':
                 asm = self.get_not()
             if len(asm):
-                out_file.write(asm)
+                out_file.write(textwrap.dedent(asm))
 
     def writePushPop(self, command, segment, index):
         with open(self.file_name, "a") as out_file:
@@ -40,7 +42,7 @@ class CodeWriter:
             elif command == 'pop':
                 asm = self.writePop(segment,index)
             if len(asm):
-                out_file.write(asm)
+                out_file.write(textwrap.dedent(asm))
 
     def writePush(self, segment, index):
         if segment == 'constant':
@@ -358,4 +360,4 @@ class CodeWriter:
     def write_asm(self, asm):
         with open(self.file_name, "a") as out_file:
             if len(asm):
-                out_file.write(asm)
+                out_file.write(textwrap.dedent(asm))
