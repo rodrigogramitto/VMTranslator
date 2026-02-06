@@ -10,11 +10,24 @@ class VMTranslator:
     p = Path(filepath)
 
     if p.is_file():
-      file = Path(filepath).resolve()
-      self.parser.setFileName(file)
+      self.resolve_path(filepath)
+      self.out_file = self.parser.file_name.name + '.asm'
       self.encode()
     elif p.is_dir():
-      print('P is a directory: ', p)
+      self.out_file = p.name + '.asm'
+      self.encode_directory(p)
+
+  #need function to clear parser queue and reset loop on new file
+  def encode_directory(self, directory):
+      for file_path in directory.iterdir():
+        self.resolve_path(file_path)
+        print('New file, now encoding: ', self.parser.file_name)
+        self.encode()
+
+  def resolve_path(self, filepath):
+    file = Path(filepath).resolve()
+    if file.suffix == '.vm':
+      self.parser.setFileName(file)
 
   def encode(self):
     self.code = CodeWriter(self.out_file)

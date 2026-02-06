@@ -10,8 +10,9 @@ class Parser:
     self.file_name = ''
     self.cur_instruction = ''
     self.line_number = 0
-    with open(self.file_name) as file:
-      self.lines = deque(file.readlines())
+    if len(self.file_name):
+      with open(self.file_name) as file:
+        self.lines = deque(file.readlines())
 
   def hasMoreLines(self):
     return len(self.lines) > 0
