@@ -320,11 +320,28 @@ class CodeWriter:
     def setFileName(self):
         return
 
-    def writeGoto(self):
-        return
+    def writeLabel(self, label):
+        asm = f"""({label})"""
+        self.write_asm(asm)
 
-    def writeIf(self):
-        return
+    def writeGoto(self, label):
+        asm = f"""
+            @{label}
+            0;JMP
+        """
+        self.write_asm(asm)
+
+    def writeIf(self, label):
+        asm = f"""
+            @SP
+            M=M-1
+            A=M
+            D=M
+            @{label}
+            D;JNE
+        """
+        self.write_asm(asm)
+
 
     def writeFunction(self):
         return
@@ -341,3 +358,8 @@ class CodeWriter:
 
     def bootstrap(self):
         return
+
+    def write_asm(self, asm):
+        with open(self.file_name, "a") as out_file:
+            if len(asm):
+                out_file.write(asm)

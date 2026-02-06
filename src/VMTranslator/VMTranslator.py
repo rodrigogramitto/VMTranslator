@@ -19,12 +19,22 @@ class VMTranslator:
     self.code = CodeWriter(filepath)
     while self.parser.hasMoreLines():
       self.parser.advance()
-      if self.parser.commandType() == CommandType.C_PUSH:
+      cur_cmd_type = self.parser.commandType()
+      if cur_cmd_type == CommandType.C_PUSH:
         cmd, seg, idx = self.parser.get_instruction()
         self.code.writePushPop(cmd, seg, idx)
-      elif self.parser.commandType() == CommandType.C_POP:
+      elif cur_cmd_type == CommandType.C_POP:
         cmd, seg, idx = self.parser.get_instruction()
         self.code.writePushPop(cmd, seg, idx)
-      elif self.parser.commandType() == CommandType.C_ARITHMETIC:
+      elif cur_cmd_type == CommandType.C_ARITHMETIC:
         cmd = self.parser.get_instruction()[0]
         self.code.writeArithmetic(cmd, self.parser.line_number)
+      elif cur_cmd_type == CommandType.C_LABEL:
+        label = self.parser.get_instruction()[1]
+        self.code.writeLabel(label)
+      elif cur_cmd_type == CommandType.C_GOTO:
+        label = self.parser.get_instruction()[1]
+        self.code.writeGoto(label)
+      elif cur_cmd_type == CommandType.C_IF:
+        label = self.parser.get_instruction()[1]
+        self.code.writeIf(label)
