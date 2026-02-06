@@ -6,15 +6,21 @@ from src.VMTranslator.parser.library.commandType import CommandType
 class VMTranslator:
   def __init__(self, filepath):
     self.out_file = ''
-    self.parser = Parser()
+    self.parser = None
+    self.code = None
     p = Path(filepath)
 
+    # Initialize codewriter
+    self.out_file = p.stem + '.asm'
+    self.code = CodeWriter(self.out_file)
+
     if p.is_file() and p.suffix == '.vm':
-      self.parser.setFileName(p.resolve())
-      self.out_file = p.stem + '.asm'
+      self.parser = Parser(p.resolve())
+      print("Out file: ", self.out_file)
       self.encode()
     elif p.is_dir():
       self.out_file = p.name + '.asm'
+      self.code.bootstrap()
       self.encode_directory(p)
 
   #need function to clear parser queue and reset loop on new file
@@ -22,12 +28,11 @@ class VMTranslator:
       for file_path in directory.iterdir():
         file = Path(file_path).resolve()
         if file.suffix == '.vm':
-          self.parser.setFileName(file)
+          self.parser = Parser(file)
           self.encode()
 
 
   def encode(self):
-    self.code = CodeWriter(self.out_file)
     while self.parser.hasMoreLines():
       self.parser.advance()
       cur_cmd_type = self.parser.commandType()

@@ -1,8 +1,6 @@
 from src.VMTranslator.code_writer.library.segmentMap import SEGMENT_MAP
 import textwrap
 
-#missing pop temp, static and pointer
-
 class CodeWriter:
     def __init__(self, file_name):
         self.file_name = file_name
@@ -314,6 +312,7 @@ class CodeWriter:
         A=A-1
         M=!M
         """
+
     # SECTION TODO:
     def setFileName(self):
         return
@@ -405,3 +404,8 @@ class CodeWriter:
     def bootstrap(self):
         self.write_bootstrap()
         self.writeCall('Sys.init', 0)
+
+
+    #Tomorrow
+        # Write function
+        # Write return

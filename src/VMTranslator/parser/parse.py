@@ -6,11 +6,16 @@ from src.VMTranslator.parser.library.commands import (
 )
 
 class Parser:
-  def __init__(self):
+  def __init__(self, filename):
     self.file_name = ''
     self.cur_instruction = ''
     self.line_number = 0
     self.lines = []
+
+    self.setFileName(filename)
+    with open(self.file_name) as file:
+        self.lines.clear()
+        self.lines = deque(file.readlines())
 
   def hasMoreLines(self):
     return len(self.lines) > 0
@@ -65,6 +70,3 @@ class Parser:
 
   def setFileName(self, name):
     self.file_name = name
-    with open(self.file_name) as file:
-        self.lines.clear()
-        self.lines = deque(file.readlines())
