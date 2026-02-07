@@ -381,9 +381,71 @@ class CodeWriter:
         self.write_asm(asm)
 
     def writeReturn(self):
-        return
+        asm = f"""
+        // Set endFrame
+        @LCL
+        D=M
+        @endFrame
+        M=D
+        // Set returnAddress *(endFrame - 5)
+        @5
+        A=D-A
+        D=M
+        @retAddress
+        M=D
+        // Pop stack into ARG
+        @SP
+        M=M-1
+        A=M
+        D=M
+        @ARG
+        A=M
+        M=D
+        // SP = ARG + 1
+        @ARG
+        D=M
+        @SP
+        M=D+1
+        // Restore that *(endFrame - 1)
+        @endFrame
+        D=M-1
+        A=D
+        D=M
+        @THAT
+        M=D
+        // restore this *(endFrame - 2)
+        @2
+        D=A
+        @endFrame
+        D=M-D
+        A=D
+        D=M
+        @THIS
+        M=D
+        // restore arg  *(endFrame - 3)
+        @3
+        D=A
+        @endFrame
+        D=M-D
+        A=D
+        D=M
+        @ARG
+        M=D
+        // restore lcl *(endFrame - 4)
+        @4
+        D=A
+        @endFrame
+        D=M-D
+        A=D
+        D=M
+        @LCL
+        M=D
+        // goto return address
+        @retAddress
+        0;JMP
+        """
+        self.write_asm(asm)
 
-    #close output file
     def close(self):
         return
 
@@ -415,8 +477,3 @@ class CodeWriter:
     def bootstrap(self):
         self.write_bootstrap()
         self.writeCall('Sys.init', 0)
-
-
-    #Tomorrow
-        # Write function
-        # Write return
