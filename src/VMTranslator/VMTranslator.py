@@ -15,8 +15,9 @@ class VMTranslator:
     self.code = CodeWriter(self.out_file)
 
     if p.is_file() and p.suffix == '.vm':
-      self.parser = Parser(p.resolve())
-      print("Out file: ", self.out_file)
+      file_name = p.resolve()
+      self.parser = Parser(file_name)
+      self.code.set_cur_file(file_name.stem)
       self.encode()
     elif p.is_dir():
       self.out_file = p.name + '.asm'
@@ -29,6 +30,7 @@ class VMTranslator:
         file = Path(file_path).resolve()
         if file.suffix == '.vm':
           self.parser = Parser(file)
+          self.code.set_cur_file(file.stem)
           self.encode()
 
 

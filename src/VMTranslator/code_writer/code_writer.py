@@ -4,9 +4,13 @@ import textwrap
 class CodeWriter:
     def __init__(self, file_name):
         self.file_name = file_name
+        self.cur_file = ''
         self.call_id = 1
         with open(self.file_name, 'w') as f:
             return
+
+    def set_cur_file(self, file_name):
+        self.cur_file = file_name
 
     def writeArithmetic(self, command, line_number):
         with open(self.file_name, "a") as out_file:
@@ -48,7 +52,7 @@ class CodeWriter:
         elif segment == 'temp':
             return self.push_temp(index)
         elif segment == 'static':
-            return self.push_static(index, self.file_name)
+            return self.push_static(index, self.cur_file)
         elif segment == 'pointer':
             return self.push_pointer(index)
         elif self.is_valid_segment(segment):
@@ -60,7 +64,7 @@ class CodeWriter:
         if segment == 'temp':
             return self.get_pop_temp(index)
         elif segment == 'static':
-            return self.get_pop_static(index, self.file_name)
+            return self.get_pop_static(index, self.cur_file)
         elif segment == 'pointer':
             return self.get_pop_pointer(index)
         elif self.is_valid_segment(segment):
