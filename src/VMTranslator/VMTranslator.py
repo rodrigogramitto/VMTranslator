@@ -55,5 +55,10 @@ class VMTranslator:
         label = self.parser.get_instruction()[1]
         self.code.writeIf(label)
       elif cur_cmd_type == CommandType.C_FUNCTION:
-        cmd, name, params = self.parser.get_instruction()
-        self.code.writeFunction(name, params)
+        cmd, function_name, params = self.parser.get_instruction()
+        self.code.writeFunction(function_name, params)
+      elif cur_cmd_type == CommandType.C_RETURN:
+        self.code.writeReturn()
+      elif cur_cmd_type == CommandType.C_CALL:
+        cmd, function_name, n_args = self.parser.get_instruction()
+        self.code.writeCall( function_name, n_args)

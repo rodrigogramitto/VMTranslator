@@ -4,7 +4,7 @@ import textwrap
 class CodeWriter:
     def __init__(self, file_name):
         self.file_name = file_name
-        self.call_id = 0
+        self.call_id = 1
         with open(self.file_name, 'w') as f:
             return
 
@@ -313,7 +313,6 @@ class CodeWriter:
         M=!M
         """
 
-    # SECTION TODO:
     def setFileName(self):
         return
 
@@ -357,16 +356,22 @@ class CodeWriter:
     def writeCall(self, function_name, n_args):
         asm = f"""
         @{function_name}$ret.{self.call_id}
+        D=A
+        @SP
+        A=M
+        M=D
+        @SP
+        M=M+1
         {self.get_segment_push('LCL')}
         {self.get_segment_push('ARG')}
         {self.get_segment_push('THIS')}
         {self.get_segment_push('THAT')}
         @SP
         D=M
-        @5
-        D=D-M
         @{n_args}
-        D=D-M
+        D=D-A
+        @5
+        D=D-A
         @ARG
         M=D
         @SP
@@ -380,16 +385,28 @@ class CodeWriter:
         self.call_id += 1
         self.write_asm(asm)
 
+    def get_segment_push(self, segment):
+        return f"""
+        @{segment}
+        D=M
+        @SP
+        A=M
+        M=D
+        @SP
+        M=M+1
+        """
+
     def writeReturn(self):
         asm = f"""
-        // Set endFrame
+        // endFrame = LCL
         @LCL
         D=M
         @endFrame
         M=D
-        // Set returnAddress *(endFrame - 5)
+        // returnAddress = *(endFrame - 5)
         @5
-        A=D-A
+        D=D-A
+        A=D
         D=M
         @retAddress
         M=D
@@ -403,13 +420,13 @@ class CodeWriter:
         M=D
         // SP = ARG + 1
         @ARG
-        D=M
+        D=M+1
         @SP
-        M=D+1
+        M=D
         // Restore that *(endFrame - 1)
         @endFrame
-        D=M-1
-        A=D
+        D=M
+        A=D-1
         D=M
         @THAT
         M=D
@@ -442,6 +459,7 @@ class CodeWriter:
         M=D
         // goto return address
         @retAddress
+        A=M
         0;JMP
         """
         self.write_asm(asm)
@@ -453,17 +471,6 @@ class CodeWriter:
         with open(self.file_name, "a") as out_file:
             if len(asm):
                 out_file.write(textwrap.dedent(asm))
-
-    def get_segment_push(self, segment):
-        return f"""
-        @{segment}
-        D=M
-        @SP
-        A=M
-        M=D
-        @SP
-        M=M+1
-        """
 
     def write_bootstrap(self):
         asm = f"""
